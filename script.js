@@ -11,12 +11,13 @@ function selectTemplate(id) {
 function generateReportButtonRun() {
   let statResult = document.getElementById("statResult").value;
   let parseResultTextArea = document.getElementById("parseResult");
-  let templateText = parseResultTextArea.value;
 
-  if(templateText == "") {
+  if(parseResultTextArea.value == "") {
     alert("Нужно выбрать метод статистики");
     return;
   }
+
+  let templateText = template;
   
 
   let lines = statResult.split("\n");
@@ -44,23 +45,34 @@ function generateReportButtonRun() {
     }
   }
   //Значение Т критерия: {t}.
-  let t = parseFloat(lineResult.split("\t")[4].trim());
+  let t = parseFloat(lineResult.split("\t")[4].trim()).toFixed(2);
   //Уровень значимости (p): {p}.
-  let p = parseFloat(lineResult.split("\t")[6].trim());
+  let p = parseFloat(lineResult.split("\t")[6].trim()).toFixed(2);
   let dif = parseFloat(lineResult.split("\t")[5].trim());
+  let timesMore = parseFloat(mean1 > mean2 ? mean1/mean2 : mean2/mean1).toFixed(2);
+  let groupStronger = mean1 > mean2 ? groupName1 : groupName2;
+  let groupWeaker = mean1 > mean2 ? groupName2 : groupName1;
+  let moreByOrIn = timesMore < 1.2 ? `на ${dif}` : `в ${timesMore} раз`;
+  let conclusion = "Достоверных различий не найдено (p > 0,05)";
+  if (p < 0.056) {
+    conclusion = `Найдены достоверные различия(p < 0,05).
+    В группе "${groupStronger}" среднее значение было больше ${moreByOrIn}, чем в группе "${groupWeaker}" (${mean1}±${ser1} против ${mean2}±${ser2}).`;
+  }
 
-  templateText = templateText.replace("{Переменная}", varibale);
-  templateText = templateText.replace("{Группа 1}", groupName1);
-  templateText = templateText.replace("{Группа 2}", groupName2);
-  templateText = templateText.replace("{n1}", n1);
-  templateText = templateText.replace("{mean1}", mean1);
-  templateText = templateText.replace("{ser1}", ser1);
-  templateText = templateText.replace("{n2}", n2);
-  templateText = templateText.replace("{mean2}", mean2);
-  templateText = templateText.replace("{ser2}", ser2);
-  templateText = templateText.replace("{t}", t);
-  templateText = templateText.replace("{p}", p);
-  templateText = templateText.replace("{dif}", dif);
+  templateText = templateText.replaceAll("{Переменная}", varibale);
+  templateText = templateText.replaceAll("{Группа 1}", groupName1);
+  templateText = templateText.replaceAll("{Группа 2}", groupName2);
+  templateText = templateText.replaceAll("{n1}", n1);
+  templateText = templateText.replaceAll("{mean1}", mean1);
+  templateText = templateText.replaceAll("{ser1}", ser1);
+  templateText = templateText.replaceAll("{n2}", n2);
+  templateText = templateText.replaceAll("{mean2}", mean2);
+  templateText = templateText.replaceAll("{ser2}", ser2);
+  templateText = templateText.replaceAll("{t}", t);
+  templateText = templateText.replaceAll("{p}", p);
+  templateText = templateText.replaceAll("{dif}", dif);
+  templateText = templateText.replaceAll("{conclusion}", conclusion);
+  //{Заключение}
 
   console.log("varibale=" + varibale);
   console.log("groupName1=" + groupName1);

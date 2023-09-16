@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Stat Report</title>
+</head>
+
+<body>
+  <h1 id="header"></h1>
+  <div>
+    <form>
+      <table id="tableListMethods">
+        <tr class="headerRowListMethods"><td colspan="2">Количественные</td><td colspan="2">Качественные</td></tr>
+        <tr class="headerRowListMethods">
+          <td>Независимые</td><td>Парные</td>
+          <td>Независимые</td><td>Парные</td>
+        </tr>
+        <tr>
+          <td>
+            <div>
+              <input type="radio" id="student" name="student"/>
+              <label for="student">t-критерий Стьюдента</label>
+            </div>
+            <div>
+              <input type="radio" id="MannWhitney" name="student"/>
+              <label for="MannWhitney">U-критерий Манна - Уитни</label>
+            </div>
+          </td>
+          <td>
+            <div>
+              <input type="radio" id="studentPaired" name="studentPaired"/>
+              <label for="studentPaired">Парный t-критерий Стьюдента</label>
+            </div>
+            <div>
+              <input type="radio" id="KruskalWallis" name="KruskalWallis"/>
+              <label for="KruskalWallis">Критерий Крускала-Уоллиса</label>
+            </div>
+          </td>
+
+          <td>
+            <div>
+              <input type="radio" id="ftest" name="ftest"/>
+              <label for="ftest">Фишера (2Х2 группы)</label>
+            </div>
+            <div>
+              <input type="radio" id="ChiSquared" name="ChiSquared"/>
+              <label for="ChiSquared">Хи-квадрат (более групп)</label>
+            </div>
+          </td>
+          <td>
+            <div>
+              <input type="radio" id="McNemar" name="McNemar"/>
+              <label for="McNemar">Критерий Мак-Нимара</label>
+            </div>
+          </td>
+        </tr>
+        </table>
+        <button id="generateReportButton" onclick="generateReportButtonRun()">Generate report</button>
+      
+
+      <table>
+        <tr>
+          <td>
+            <textarea cols="160" rows="15" id="statResult">
+                  Пол	N	Среднее	Стд. отклонение	Стд. ошибка среднего					
+                Возраст 	Муж	31	54.10	19.714	3.541					
+                    Жен	122	53.18	14.166	1.283					
+                                                        
+                Критерий для независимых выборок										
+                         Критерий равенства дисперсий Ливиня		t-критерий равенства средних						
+                        F	Знч.	t	ст.св.	Значимость (2-сторонняя)	Разность средних	Стд. ошибка разности	95% доверительный интервал разности средних	
+                                                    Нижняя граница	Верхняя граница
+                Возраст 	Предполагается равенство дисперсий	7.555	.007	.295	151	.768	.916	3.103	-5.215	7.047
+                    Равенство дисперсий не предполагается			.243	38.226	.809	.916	3.766	-6.706	8.538
+                
+            </textarea>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <pre id="parseResult">
+          </pre>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </div>
+  <script src="template.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

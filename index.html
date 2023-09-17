@@ -25,38 +25,38 @@
       <tr>
         <td>
           <div>
-            <input onclick="selectTemplate(this.id)" type="radio" id="student" name="student" />
-            <label for="student">t-критерий Стьюдента</label>
+            <input class = "statMethodsClass" type="radio" id="Student" name="statRadios" />
+            <label for="Student">t-критерий Стьюдента</label>
           </div>
           <div>
-            <input type="radio" id="MannWhitney" name="student" />
+            <input class = "statMethodsClass" type="radio" id="MannWhitney" name="statRadios" />
             <label for="MannWhitney">U-критерий Манна - Уитни</label>
           </div>
         </td>
         <td>
           <div>
-            <input type="radio" id="studentPaired" name="studentPaired" />
-            <label for="studentPaired">Парный t-критерий Стьюдента</label>
+            <input class = "statMethodsClass" type="radio" id="StudentPaired" name="statRadios" />
+            <label for="StudentPaired">Парный t-критерий Стьюдента</label>
           </div>
           <div>
-            <input type="radio" id="KruskalWallis" name="KruskalWallis" />
+            <input class = "statMethodsClass" type="radio" id="KruskalWallis" name="statRadios" />
             <label for="KruskalWallis">Критерий Крускала-Уоллиса</label>
           </div>
         </td>
 
         <td>
           <div>
-            <input type="radio" id="ftest" name="ftest" />
-            <label for="ftest">Фишера (2Х2 группы)</label>
+            <input class = "statMethodsClass" type="radio" id="Ftest" name="statRadios" />
+            <label for="Ftest">Фишера (2Х2 группы)</label>
           </div>
           <div>
-            <input type="radio" id="ChiSquared" name="ChiSquared" />
+            <input class = "statMethodsClass" type="radio" id="ChiSquared" name="statRadios" />
             <label for="ChiSquared">Хи-квадрат (более групп)</label>
           </div>
         </td>
         <td>
           <div>
-            <input type="radio" id="McNemar" name="McNemar" />
+            <input class = "statMethodsClass" type="radio" id="McNemar" name="statRadios" />
             <label for="McNemar">Критерий Мак-Нимара</label>
           </div>
         </td>
@@ -84,10 +84,11 @@
         </td>
       </tr>
       <tr>
-        <td><textarea cols="160" rows="15" id="parseResult"></textarea></td>
+        <td><textarea cols="160" rows="25" id="parseResult"></textarea></td>
       </tr>
     </table>
   </div>
+  <script src="generateMethods.js"></script>
   <script src="template.js"></script>
   <script src="script.js"></script>
 </body>

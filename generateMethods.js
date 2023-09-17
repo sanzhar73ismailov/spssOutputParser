@@ -82,12 +82,64 @@ function generateStudent(templateText, lines) {
 }
 
 function generateChiSquared(templateText, lines) {
-    let lineResult = "";
-    for (let line of lines) {
-        if (line.includes("Хи-квадрат Пирсона")) {
-          lineResult = line;
-          break;
-        }
-      }
+  let lineResult = "";
+  lineResult = searchLine(lines, "Хи-квадрат Пирсона");
+
+  // Цель: Оценить влияние показателя "{Переменная1}" на показатель "{Переменная2}"
+  let lineVarNames = lines[getLineIndexByText(lines, "Процент") + 1].split("t")[0];
+  let var1 = lineVarNames.split("*")[0].trim();
+  let var2 = lineVarNames.split("*")[1].trim();
+
+
+  // Обоснование выбора метода:
+  //   Оба показателя являются качественными.
+  //   Более двух групп сравнения.
+  // Метод сранения:  Таблица сопряженности с оценкой различий с помощью критерия χ2.
+  // Значение критерия (хи-квадрата Пирсона): {t}.
+  let t = parseFloat(replaceAbc(lineResult.split("\t")[1].trim())).toFixed(2);
+  // Уровень значимости (p): {p}.
+  let p = parseFloat(replaceAbc(lineResult.split("\t")[3].trim())).toFixed(2);
+
+  // Заключение.
+  // #Если не найдено
+  // Достоверных различий не найдено (p > 0,05)
+  // #Иначе
+  // Найдены достоверные различия(p < 0,05).
+  // В группе {Наименование группы} процент варианта "" был больше в {x} раз/на {x}.
+
+  // Таблицу сопряженности см. в файле "{название файла}".
+
+  // Корреляция по {Пирсону/Спирмену} найдена/не найдена (correlP) 
+  let correlP = searchLine(lines, "Корреляция Спирмена");
+
+  // Уровень корреляции (correlT) - {словесное описание}
+
   return "generateChiSquared";
+}
+
+function searchLine(lines, searchString) {
+  for (let line of lines) {
+    if (line.includes(searchString))
+      return line;
+  }
+  return "";
+}
+
+function getLineIndexByText(lines, searchString) {
+  for (let i=0; i < lines.length; i++) {
+    if (lines[i].includes(searchString))
+      return i;
+  }
+  return -1;
+}
+
+function replaceSymbols(text, arrSimbols) {
+  for (let s of arrSimbols) {
+    text = text.replaceAll(s, "");
+  }
+  return text;
+}
+
+function replaceAbc(text) {
+  return replaceSymbols(text, "abcdefg".split(""));
 }

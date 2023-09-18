@@ -32,5 +32,13 @@ function generateReportButtonRun() {
   }
   let selectedId = getSelectedRadioButtonId();
   let templateText = template.get(selectedId);
-  parseResultTextArea.value = generateTemplateTxt(selectedId, templateText, statResult);
+
+  try {
+    parseResultTextArea.value = generateTemplateTxt(selectedId, templateText, statResult);
+  }
+  catch(err) {
+    parseResultTextArea.value = `Ошибка: ${err.message}`;
+  }
+  
+  
 }

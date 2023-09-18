@@ -1,5 +1,8 @@
 function generateTemplateTxt(radioId, templateText, statResultText) {
   let result = "нет функции generate";
+  if (statResultText.trim() == "") {
+    throw new Error("Нет данных в области результатов стат. обработки");
+  }
   let lines = statResultText.split("\n");
 
   if (radioId == "Student") {
@@ -27,7 +30,7 @@ function generateStudent(templateText, lines) {
   let mean2 = lineTwo.split("\t")[3].trim();
   let ser2 = lineTwo.split("\t")[5].trim();
   let lineResult = searchLine(lines, "Предполагается равенство дисперсий");
-  
+
   let t = parseFloatWithTwoDigits(lineResult.split("\t")[4]);
   let p = parseFloatWithTwoDigits(lineResult.split("\t")[6]);
   let dif = parseFloatWithTwoDigits(lineResult.split("\t")[5].trim());
@@ -56,38 +59,51 @@ function generateStudent(templateText, lines) {
   mapReplaces.set("{p}", p);
   mapReplaces.set("{dif}", dif);
   mapReplaces.set("{conclusion}", conclusion);
-  
+
   return replaceAllPlaceHoders(templateText, mapReplaces);
 }
 
 function generateChiSquared(templateText, lines) {
-  let lineResult = "";
-  lineResult = searchLine(lines, "Хи-квадрат Пирсона");
+  try {
+    if (searchLine(lines, "Таблица сопряженности") == "") {
+      throw new Error("Нет результатов хи-квадрата");
+    }
+    let lineResult = "";
+    lineResult = searchLine(lines, "Хи-квадрат Пирсона");
 
-  let lineVarNames = lines[getLineIndexByText(lines, "Процент") + 1].split("\t")[0];
-  let var1 = lineVarNames.split("*")[0].trim();
-  let var2 = lineVarNames.split("*")[1].trim();
-  let t = parseFloatWithTwoDigits(lineResult.split("\t")[1]);
-  let p = parseFloatWithTwoDigits(lineResult.split("\t")[3]);
-  let correlLine = searchLine(lines, "Корреляция Спирмена");
-  let correlP = parseFloatWithTwoDigits(correlLine.split("\t")[3]);
-  let notPrefix = correlP < 0.05 ? "" : "не ";
-  let correlT = parseFloatWithTwoDigits(correlLine.split("\t")[2]);
-  let correlDescr = getCorrelDescr(correlT);
-  
-  let ifCorrelFound =  correlP < 0.05 ? `Уровень корреляции {correlT} - {correlDescr}` : "";
+    let lineVarNames = lines[getLineIndexByText(lines, "Процент") + 1].split("\t")[0];
+    let var1 = lineVarNames.split("*")[0].trim();
+    let var2 = lineVarNames.split("*")[1].trim();
+    let t = parseFloatWithTwoDigits(lineResult.split("\t")[1]);
+    let p = parseFloatWithTwoDigits(lineResult.split("\t")[3]);
+    //Достоверные различия {prefixDiffFound}найдены (p {pMoreOrLessSign} 0).
+    let prefixDiffFound = p <= 0.05 ? "" : "не ";
+    let pMoreOrLessSign = p <= 0.05 ? "<" : ">";
+    let correlLine = searchLine(lines, "Корреляция Спирмена");
+    let correlP = parseFloatWithTwoDigits(correlLine.split("\t")[3]);
+    let notPrefix = correlP < 0.05 ? "" : "не ";
+    let correlT = parseFloatWithTwoDigits(correlLine.split("\t")[2]);
+    let correlDescr = getCorrelDescr(correlT);
 
-  let mapReplaces = new Map();
-  mapReplaces.set("{Переменная1}", var1);
-  mapReplaces.set("{Переменная2}", var2);
-  mapReplaces.set("{t}", t);
-  mapReplaces.set("{p}", p);
-  //mapReplaces.set("{correlT}", correlT);
-  mapReplaces.set("{correlP}", correlP);
-  mapReplaces.set("{не}", notPrefix);
-  mapReplaces.set("{ifCorrelFound}", ifCorrelFound);
+    let ifCorrelFound = correlP < 0.05 ? `Уровень корреляции {correlT} - {correlDescr}` : "";
 
-  return replaceAllPlaceHoders(templateText, mapReplaces);
+    let mapReplaces = new Map();
+    mapReplaces.set("{Переменная1}", var1);
+    mapReplaces.set("{Переменная2}", var2);
+    mapReplaces.set("{t}", t);
+    mapReplaces.set("{p}", p);
+    mapReplaces.set("{prefixDiffFound}", prefixDiffFound);
+    mapReplaces.set("{pMoreOrLessSign}", pMoreOrLessSign);
+    //mapReplaces.set("{correlT}", correlT);
+    mapReplaces.set("{correlP}", correlP);
+    mapReplaces.set("{не}", notPrefix);
+    mapReplaces.set("{ifCorrelFound}", ifCorrelFound);
+
+    return replaceAllPlaceHoders(templateText, mapReplaces);
+  } catch (err) {
+    throw err;
+  }
+
 }
 
 function getCorrelDescr(p) {

@@ -11,15 +11,14 @@ function generateTemplateTxt(radioId, templateText, statResultText) {
 }
 
 function generateStudent(templateText, lines) {
-  let lineZero = lines[0];
-  let lineOne = lines[1];
-  let lineTwo = lines[2];
-  //"{Переменная}" между 2-мя группами:
+  let lineZeroInd = getLineIndexByText(lines, "Среднее");
+  let lineZero = lines[lineZeroInd];
+  let lineOne = lines[lineZeroInd + 1];
+  let lineTwo = lines[lineZeroInd + 2];
+
   let varibale = lineOne.split("\t")[0].trim();
   let secVaribale = lineZero.split("\t")[1].trim();
-  //{Группа 1}
   let groupName1 = secVaribale + " " + lineOne.split("\t")[1].trim();
-  //{Группа 2}
   let groupName2 = secVaribale + " " + lineTwo.split("\t")[1].trim();
   let n1 = lineOne.split("\t")[2].trim();
   let mean1 = lineOne.split("\t")[3].trim();
@@ -27,21 +26,12 @@ function generateStudent(templateText, lines) {
   let n2 = lineTwo.split("\t")[2].trim();
   let mean2 = lineTwo.split("\t")[3].trim();
   let ser2 = lineTwo.split("\t")[5].trim();
-  let lineResult = "";
-  for (let line of lines) {
-    if (line.includes("Предполагается равенство дисперсий")) {
-      lineResult = line;
-      break;
-    }
-  }
-  //Значение Т критерия: {t}.
-  let t = parseFloat(lineResult.split("\t")[4].trim()).toFixed(2);
-  //Уровень значимости (p): {p}.
-  let p = parseFloat(lineResult.split("\t")[6].trim()).toFixed(2);
-  let dif = parseFloat(lineResult.split("\t")[5].trim());
-  let timesMore = parseFloat(
-    mean1 > mean2 ? mean1 / mean2 : mean2 / mean1
-  ).toFixed(2);
+  let lineResult = searchLine(lines, "Предполагается равенство дисперсий");
+  
+  let t = parseFloatWithTwoDigits(lineResult.split("\t")[4]);
+  let p = parseFloatWithTwoDigits(lineResult.split("\t")[6]);
+  let dif = parseFloatWithTwoDigits(lineResult.split("\t")[5].trim());
+  let timesMore = parseFloatWithTwoDigits(mean1 > mean2 ? mean1 / mean2 : mean2 / mean1);
   let groupStronger = mean1 > mean2 ? groupName1 : groupName2;
   let groupWeaker = mean1 > mean2 ? groupName2 : groupName1;
   let moreByOrIn = timesMore < 1.2 ? `на ${dif}` : `в ${timesMore} раз`;
@@ -51,70 +41,70 @@ function generateStudent(templateText, lines) {
       В группе "${groupStronger}" среднее значение было больше ${moreByOrIn}, чем в группе "${groupWeaker}" (${mean1}±${ser1} против ${mean2}±${ser2}).`;
   }
 
-  templateText = templateText.replaceAll("{Переменная}", varibale);
-  templateText = templateText.replaceAll("{Группа 1}", groupName1);
-  templateText = templateText.replaceAll("{Группа 2}", groupName2);
-  templateText = templateText.replaceAll("{n1}", n1);
-  templateText = templateText.replaceAll("{mean1}", mean1);
-  templateText = templateText.replaceAll("{ser1}", ser1);
-  templateText = templateText.replaceAll("{n2}", n2);
-  templateText = templateText.replaceAll("{mean2}", mean2);
-  templateText = templateText.replaceAll("{ser2}", ser2);
-  templateText = templateText.replaceAll("{t}", t);
-  templateText = templateText.replaceAll("{p}", p);
-  templateText = templateText.replaceAll("{dif}", dif);
-  templateText = templateText.replaceAll("{conclusion}", conclusion);
+  let mapReplaces = new Map();
 
-  console.log("varibale=" + varibale);
-  console.log("groupName1=" + groupName1);
-  console.log("groupName2=" + groupName2);
-  console.log("n1=" + n1);
-  console.log("n2=" + n2);
-  console.log("mean1=" + mean1);
-  console.log("ser1=" + ser1);
-  console.log("mean2=" + mean2);
-  console.log("ser2=" + ser2);
-  console.log("t=" + t);
-  console.log("p=" + p);
-  console.log("dif=" + dif);
-
-  return templateText;
+  mapReplaces.set("{Переменная}", varibale);
+  mapReplaces.set("{Группа 1}", groupName1);
+  mapReplaces.set("{Группа 2}", groupName2);
+  mapReplaces.set("{n1}", n1);
+  mapReplaces.set("{mean1}", mean1);
+  mapReplaces.set("{ser1}", ser1);
+  mapReplaces.set("{n2}", n2);
+  mapReplaces.set("{mean2}", mean2);
+  mapReplaces.set("{ser2}", ser2);
+  mapReplaces.set("{t}", t);
+  mapReplaces.set("{p}", p);
+  mapReplaces.set("{dif}", dif);
+  mapReplaces.set("{conclusion}", conclusion);
+  
+  return replaceAllPlaceHoders(templateText, mapReplaces);
 }
 
 function generateChiSquared(templateText, lines) {
   let lineResult = "";
   lineResult = searchLine(lines, "Хи-квадрат Пирсона");
 
-  // Цель: Оценить влияние показателя "{Переменная1}" на показатель "{Переменная2}"
-  let lineVarNames = lines[getLineIndexByText(lines, "Процент") + 1].split("t")[0];
+  let lineVarNames = lines[getLineIndexByText(lines, "Процент") + 1].split("\t")[0];
   let var1 = lineVarNames.split("*")[0].trim();
   let var2 = lineVarNames.split("*")[1].trim();
+  let t = parseFloatWithTwoDigits(lineResult.split("\t")[1]);
+  let p = parseFloatWithTwoDigits(lineResult.split("\t")[3]);
+  let correlLine = searchLine(lines, "Корреляция Спирмена");
+  let correlP = parseFloatWithTwoDigits(correlLine.split("\t")[3]);
+  let notPrefix = correlP < 0.05 ? "" : "не ";
+  let correlT = parseFloatWithTwoDigits(correlLine.split("\t")[2]);
+  let correlDescr = getCorrelDescr(correlT);
+  
+  let ifCorrelFound =  correlP < 0.05 ? `Уровень корреляции {correlT} - {correlDescr}` : "";
 
+  let mapReplaces = new Map();
+  mapReplaces.set("{Переменная1}", var1);
+  mapReplaces.set("{Переменная2}", var2);
+  mapReplaces.set("{t}", t);
+  mapReplaces.set("{p}", p);
+  //mapReplaces.set("{correlT}", correlT);
+  mapReplaces.set("{correlP}", correlP);
+  mapReplaces.set("{не}", notPrefix);
+  mapReplaces.set("{ifCorrelFound}", ifCorrelFound);
 
-  // Обоснование выбора метода:
-  //   Оба показателя являются качественными.
-  //   Более двух групп сравнения.
-  // Метод сранения:  Таблица сопряженности с оценкой различий с помощью критерия χ2.
-  // Значение критерия (хи-квадрата Пирсона): {t}.
-  let t = parseFloat(replaceAbc(lineResult.split("\t")[1].trim())).toFixed(2);
-  // Уровень значимости (p): {p}.
-  let p = parseFloat(replaceAbc(lineResult.split("\t")[3].trim())).toFixed(2);
+  return replaceAllPlaceHoders(templateText, mapReplaces);
+}
 
-  // Заключение.
-  // #Если не найдено
-  // Достоверных различий не найдено (p > 0,05)
-  // #Иначе
-  // Найдены достоверные различия(p < 0,05).
-  // В группе {Наименование группы} процент варианта "" был больше в {x} раз/на {x}.
-
-  // Таблицу сопряженности см. в файле "{название файла}".
-
-  // Корреляция по {Пирсону/Спирмену} найдена/не найдена (correlP) 
-  let correlP = searchLine(lines, "Корреляция Спирмена");
-
-  // Уровень корреляции (correlT) - {словесное описание}
-
-  return "generateChiSquared";
+function getCorrelDescr(p) {
+  let descr = "";
+  if (p < 0.2)
+    descr = "Очень слабая корреляция";
+  else if (p < 0.5)
+    descr = "Слабая корреляция";
+  else if (p < 0.7)
+    descr = "Средняя корреляция";
+  else if (p < 0.9)
+    descr = "Высокая корреляция";
+  else if (p <= 1)
+    descr = "Очень высокая корреляция";
+  else
+    throw "Too Big"
+  return descr;
 }
 
 function searchLine(lines, searchString) {
@@ -126,7 +116,7 @@ function searchLine(lines, searchString) {
 }
 
 function getLineIndexByText(lines, searchString) {
-  for (let i=0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length; i++) {
     if (lines[i].includes(searchString))
       return i;
   }
@@ -141,5 +131,15 @@ function replaceSymbols(text, arrSimbols) {
 }
 
 function replaceAbc(text) {
-  return replaceSymbols(text, "abcdefg".split(""));
+  return replaceSymbols(text.trim(), "abcdefg".split(""));
+}
+
+function replaceAllPlaceHoders(template, map) {
+  for (let k of map.keys())
+    template = template.replaceAll(k, map.get(k));
+  return template;
+}
+
+function parseFloatWithTwoDigits(text) {
+  return parseFloat(text).toFixed(2);
 }

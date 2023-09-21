@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 
 <head>
   <meta charset="UTF-8" />
@@ -10,75 +10,71 @@
 
 <body>
   <h1 id="header"></h1>
+  <table id="tableListMethods">
+    <tr class="headerRowListMethods">
+      <td colspan="2">Количественные</td>
+      <td colspan="2">Качественные</td>
+    </tr>
+    <tr class="headerRowListMethods">
+      <td>Независимые</td>
+      <td>Парные</td>
+      <td>Независимые</td>
+      <td>Парные</td>
+    </tr>
+    <tr>
+      <td>
+        <div>
+          <input class="statMethodsClass" type="radio" id="Student" name="statRadios" />
+          <label for="Student">t-критерий Стьюдента (парам. 2 гр.)</label>
+        </div>
+        <div>
+          <input class="statMethodsClass" type="radio" id="MannWhitney" name="statRadios" />
+          <label for="MannWhitney">U-критерий Манна - Уитни (непарам. 2 гр.)</label>
+        </div>
+        <div>
+          <input class="statMethodsClass" type="radio" id="Anova" name="statRadios" />
+          <label for="Anova">Диспер. анализ/Anova (парам. => 3 гр.)</label>
+        </div>
+      </td>
+      <td>
+        <div>
+          <input class="statMethodsClass" type="radio" id="StudentPaired" name="statRadios" />
+          <label for="StudentPaired">Парный t-критерий Стьюдента</label>
+        </div>
+        <div>
+          <input class="statMethodsClass" type="radio" id="KruskalWallis" name="statRadios" />
+          <label for="KruskalWallis">Критерий Крускала-Уоллиса</label>
+        </div>
+      </td>
+      <td>
+        <div>
+          <input class="statMethodsClass" type="radio" id="Ftest" name="statRadios" />
+          <label for="Ftest">Фишера (2Х2 группы)</label>
+        </div>
+        <div>
+          <input class="statMethodsClass" type="radio" id="ChiSquared" name="statRadios" />
+          <label for="ChiSquared">Хи-квадрат (более групп)</label>
+        </div>
+      </td>
+      <td>
+        <div>
+          <input class="statMethodsClass" type="radio" id="McNemar" name="statRadios" />
+          <label for="McNemar">Критерий Мак-Нимара</label>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <button id="generateReportButton" onclick="generateReportButtonRun()">Generate report</button>
+
   <div>
-    <table id="tableListMethods">
-      <tr class="headerRowListMethods">
-        <td colspan="2">Количественные</td>
-        <td colspan="2">Качественные</td>
-      </tr>
-      <tr class="headerRowListMethods">
-        <td>Независимые</td>
-        <td>Парные</td>
-        <td>Независимые</td>
-        <td>Парные</td>
-      </tr>
-      <tr>
-        <td>
-          <div>
-            <input class = "statMethodsClass" type="radio" id="Student" name="statRadios" />
-            <label for="Student">t-критерий Стьюдента</label>
-          </div>
-          <div>
-            <input class = "statMethodsClass" type="radio" id="MannWhitney" name="statRadios" />
-            <label for="MannWhitney">U-критерий Манна - Уитни</label>
-          </div>
-        </td>
-        <td>
-          <div>
-            <input class = "statMethodsClass" type="radio" id="StudentPaired" name="statRadios" />
-            <label for="StudentPaired">Парный t-критерий Стьюдента</label>
-          </div>
-          <div>
-            <input class = "statMethodsClass" type="radio" id="KruskalWallis" name="statRadios" />
-            <label for="KruskalWallis">Критерий Крускала-Уоллиса</label>
-          </div>
-        </td>
-
-        <td>
-          <div>
-            <input class = "statMethodsClass" type="radio" id="Ftest" name="statRadios" />
-            <label for="Ftest">Фишера (2Х2 группы)</label>
-          </div>
-          <div>
-            <input class = "statMethodsClass" type="radio" id="ChiSquared" name="statRadios" />
-            <label for="ChiSquared">Хи-квадрат (более групп)</label>
-          </div>
-        </td>
-        <td>
-          <div>
-            <input class = "statMethodsClass" type="radio" id="McNemar" name="statRadios" />
-            <label for="McNemar">Критерий Мак-Нимара</label>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <button id="generateReportButton" onclick="generateReportButtonRun()">Generate report</button>
-
-
-    <table>
-      <tr>
-        <td>
-          <textarea cols="160" rows="15" id="statResult"></textarea>
-        </td>
-      </tr>
-      <tr>
-        <td><textarea cols="160" rows="25" id="parseResult"></textarea></td>
-      </tr>
-    </table>
+    <div><textarea cols="160" rows="15" id="statResult"></textarea></div>
+    <div><textarea cols="160" rows="25" id="parseResult"></textarea></div>
   </div>
-  <script src="generateMethods.js"></script>
-  <script src="template.js"></script>
-  <script src="script.js"></script>
+  <script src="js/nunjucks.js"></script>
+  <script src="js/generateMethods.js"></script>
+  <script src="js/template.js"></script>
+  <script src="js/script.js"></script>
+  
 </body>
 
 </html>

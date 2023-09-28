@@ -23,6 +23,9 @@ function getSelectedRadioButtonId() {
 }
 
 function generateReportButtonRun() {
+  let selectedId = getSelectedRadioButtonId();
+  document.getElementById("statResult").value = selectedId == "Custom" ?
+    getCustomExample() : document.getElementById("statResult").value;
   let statResult = document.getElementById("statResult").value;
   let parseResultTextArea = document.getElementById("parseResult");
 
@@ -30,15 +33,15 @@ function generateReportButtonRun() {
     alert("Нужно выбрать метод статистики");
     return;
   }
-  let selectedId = getSelectedRadioButtonId();
+
   let templateText = template.get(selectedId);
 
   try {
     parseResultTextArea.value = generateTemplateTxt(selectedId, templateText, statResult);
   }
-  catch(err) {
+  catch (err) {
     parseResultTextArea.value = `Ошибка: ${err.message}`;
   }
-  
-  
+
+
 }

@@ -7,15 +7,10 @@ function generateTemplateTxt(radioId, templateText, statResultText) {
     throw new Error("Нет данных в области результатов стат. обработки");
   }
   let lines = statResultText.split("\n");
-
-  if (radioId == "Student") {
-    result = generateStudent(templateText, lines);
-  } else if (radioId == "ChiSquared") {
-    result = generateChiSquared(templateText, lines);
-  } else if (radioId == "Anova") {
-    result = generateAnova(templateText, lines);
-  } else {
-    throw new Error("Неизвестный radioId: ${radioId}");
+  try {
+    result = eval(`generate${radioId}(templateText, lines);`);
+  } catch (err) {
+    throw new Error(`Для radioId ${radioId} не прописана функция generate${radioId}(templateText, lines): ${err}`);
   }
   return result;
 }
@@ -100,25 +95,30 @@ function generateChiSquared(templateText, lines) {
   }
 }
 
+function generateСustom(templateText, lines) {
+  
+
+
+}
+
 function generateAnova(templateText, lines) {
-  //alert("Anova");
+  let templObject = {};
   try {
     if (searchLine(lines, "Однофакторный дисперсионный анализ") == "") {
       throw new Error("Нет результатов Однофакторного дисперсионного анализа");
     }
 
-
     let lineResult = "";
     lineResult = searchLine(lines, "Хи-квадрат Пирсона");
 
     let lineVarNames = lines[getLineIndexByText(lines, "Процент") + 1].split("\t")[0];
-    let var1 = lineVarNames.split("*")[0].trim();
-    let var2 = lineVarNames.split("*")[1].trim();
-    let t = parseFloatWithTwoDigits(lineResult.split("\t")[1]);
-    let p = parseFloatWithTwoDigits(lineResult.split("\t")[3]);
+    templObject.var1 = lineVarNames.split("*")[0].trim();
+    templObject.var2 = lineVarNames.split("*")[1].trim();
+    templObject.t = parseFloatWithTwoDigits(lineResult.split("\t")[1]);
+    templObject.p = parseFloatWithTwoDigits(lineResult.split("\t")[3]);
     //Достоверные различия {prefixDiffFound}найдены (p {pMoreOrLessSign} 0).
-    let prefixDiffFound = p <= 0.05 ? "" : "не ";
-    let pMoreOrLessSign = p <= 0.05 ? "<" : ">";
+    templObject.prefixDiffFound = templObject.p <= 0.05 ? "" : "не ";
+    let pMoreOrLessSign = templObject.p <= 0.05 ? "<" : ">";
     let correlLine = searchLine(lines, "Корреляция Спирмена");
     let correlP = parseFloatWithTwoDigits(correlLine.split("\t")[3]);
     let notPrefix = correlP < 0.05 ? "" : "не ";
@@ -139,7 +139,7 @@ function generateAnova(templateText, lines) {
     mapReplaces.set("{не}", notPrefix);
     mapReplaces.set("{ifCorrelFound}", ifCorrelFound);
 
-    return replaceAllPlaceHoders(templateText, mapReplaces);
+    return nunjucks.renderString(templateText, templObject);
   } catch (err) {
     throw err;
   }
